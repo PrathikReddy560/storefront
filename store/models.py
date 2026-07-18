@@ -42,7 +42,6 @@ class Order(models.Model):
   ]
   placed_at = models.DateTimeField(auto_now_add=True)
   payment_status = models.CharField(max_length=1, choices=PAYMENT_STATUS_CHOICES, default=PENDING)
-  item = models.ManyToManyField(Item, related_name='orders')
   customer = models.ForeignKey('Customer', on_delete=models.PROTECT, related_name='orders')
 
 #------------CUSTOMERS-----------------
@@ -57,7 +56,7 @@ class Customer(models.Model):
 #------------ORDERITEMS-----------------
 class OrderItem(models.Model):
   order = models.ForeignKey(Order, on_delete=models.PROTECT)
-  product = models.ForeignKey(Item, on_delete=models.PROTECT)
+  product = models.ForeignKey(Product, on_delete=models.PROTECT)
   quantity = models.PositiveIntegerField()
   unit_price = models.DecimalField(max_digits=10, decimal_places=2)
 
