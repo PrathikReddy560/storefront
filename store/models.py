@@ -29,11 +29,6 @@ class Product(models.Model):
   collection = models.ForeignKey(Collection, on_delete=models.PROTECT)
   promotions = models.ManyToManyField(Promotion, blank=True)
 
-#------------ITEMS-----------------
-class Item(models.Model):
-  product = models.ForeignKey(Product, on_delete=models.CASCADE)
-  quantity = models.PositiveIntegerField()
-  unit_price = models.DecimalField(max_digits=10, decimal_places=2)
 
 #------------ORDERS-----------------
 class Order(models.Model):
@@ -48,7 +43,7 @@ class Order(models.Model):
   placed_at = models.DateTimeField(auto_now_add=True)
   payment_status = models.CharField(max_length=1, choices=PAYMENT_STATUS_CHOICES, default=PENDING)
   item = models.ManyToManyField(Item, related_name='orders')
-  customer = models.OneToOneField('Customer', on_delete=models.PROTECT, related_name='orders')
+  customer = models.ForeignKey('Customer', on_delete=models.PROTECT, related_name='orders')
 
 #------------CUSTOMERS-----------------
 class Customer(models.Model):
@@ -57,6 +52,7 @@ class Customer(models.Model):
   email = models.EmailField(unique=True)
   phone = models.CharField(max_length=20, blank=True, null=True)
   birth_date = models.DateField(blank=True, null=True)
+  
 
 #------------ORDERITEMS-----------------
 class OrderItem(models.Model):
@@ -70,7 +66,7 @@ class Address(models.Model):
   street = models.CharField(max_length=255)
   city = models.CharField(max_length=100)
   zip_code = models.CharField(max_length=20)
-  customer = models.OneToOneField(Customer, on_delete=models.CASCADE, primary_key=True)
+  customer = models.ForeignKey(Customer, on_delete=models.CASCADE, primary_key=True)
 
 #------------CART-----------------
 class Cart(models.Model):
