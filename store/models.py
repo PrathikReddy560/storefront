@@ -21,8 +21,9 @@ class Product(models.Model):
     (MEMBERSHIP_GOLD, 'Gold'),
   ]
   title  = models.CharField(max_length=100)
+  slug = models.SlugField()
   description = models.TextField()
-  price = models.DecimalField(max_digits=10, decimal_places=2)
+  unit_price = models.DecimalField(max_digits=10, decimal_places=2)
   inventory = models.IntegerField()
   last_update = models.DateTimeField(auto_now=True)
   membership = models.CharField(max_length=1, choices=MEMBERSHIP_CHOICES, default=MEMBERSHIP_BRONZE)
@@ -51,6 +52,12 @@ class Customer(models.Model):
   email = models.EmailField(unique=True)
   phone = models.CharField(max_length=20, blank=True, null=True)
   birth_date = models.DateField(blank=True, null=True)
+
+  class Meta:
+    db_table = 'store_customers'
+    indexes = [
+      models.Index(fields=['last_name', 'first_name'])
+    ]
   
 
 #------------ORDERITEMS-----------------
