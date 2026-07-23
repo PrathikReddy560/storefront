@@ -3,3 +3,4 @@ Pipfile.lock
 .vscode
 store_customers.sql
 db.sqlite3
+.venv
