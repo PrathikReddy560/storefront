@@ -1,16 +1,12 @@
 from django.shortcuts import get_object_or_404, render
 from django.db.models.aggregates import Count, Min, Max, Avg, Sum
-from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from store.models import Product,Customer, Order, OrderItem, Collection,Reviews
 from . filters import ProductFilter
-from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIView
-from rest_framework.decorators import api_view
+from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.views import APIView
-from .models import Product
 from .serializer import ProductSerializer,CollectionSerializer,ReviewSerializer
 
 def say_hello(request):
@@ -24,8 +20,9 @@ def say_hello(request):
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_class = ProductFilter
+    search_fields = ['title','description']
 
     def get_serializer_context(self):
         return {'request':self.request}
