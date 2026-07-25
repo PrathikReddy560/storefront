@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, render
 from django.db.models.aggregates import Count, Min, Max, Avg, Sum
 from django.http import HttpResponse
 from store.models import Product,Customer, Order, OrderItem, Collection
+from rest_framework.generics import ListCreateAPIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -17,18 +18,14 @@ def say_hello(request):
     return render(request, 'hello.html', {'name': 'Prathik', 'result': calculate})
 
 
-class ProductList(APIView):
-    def get(self, request):
-        queryset = Product.objects.select_related('collection').all()
-        serializer = ProductSerializer(queryset, many=True,context={'request': request})
-        return Response(serializer.data)
+class ProductList(ListCreateAPIView):
+    queryset = Product.objects.select_related('collection').all()
+    serializer_class = ProductSerializer
+    def get_queryset(self):
+        return Product.objects.select_related('collection').all()
 
-    def post(self, request):
-        serializer = ProductSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data,status = status.HTTP_201_CREATED)
-        
+    def get_serializer_context(self):
+        return {'request':self.request}
 
 class ProductDetail(APIView):
     def get(self,request,id):
@@ -50,17 +47,12 @@ class ProductDetail(APIView):
 
 #-------------------------------------Collection-----------------------------------------------
 
-@api_view(['GET','POST'])
-def collection_list(request):
-    if request.method == 'GET':
-        query_set = Collection.objects.annotate(products_count=Count('products')).all()
-        serializer = CollectionSerializer(query_set, many=True,context={'request': request})
-        return Response(serializer.data)
-    elif request.method == 'POST':
-        serializer = CollectionSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data,status = status.HTTP_201_CREATED)
+class CollectionList(ListCreateAPIView):
+    queryset = Collection.objects.annotate(products_count=Count('products')).all()
+    serializer_class = CollectionSerializer
+
+    def get_serializer_context(self):
+        return {'request': self.request}
 
 @api_view(['GET','PUT','DELETE'])
 def collection_detail(request, pk):
