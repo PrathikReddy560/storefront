@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render
 from django.db.models.aggregates import Count, Min, Max, Avg, Sum
 from django.http import HttpResponse
-from store.models import Product,Customer, Order, OrderItem, Collection
+from store.models import Product,Customer, Order, OrderItem, Collection,Reviews
 from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from .models import Product
-from .serializer import ProductSerializer,CollectionSerializer
+from .serializer import ProductSerializer,CollectionSerializer,ReviewSerializer
 
 def say_hello(request):
     orders = Order.objects.filter(customer__id=1).aggregate(Count('id'))
@@ -42,3 +42,8 @@ class CollectionViewSet(ModelViewSet):
             return Response({'error':'Collection cannot be deleted cause it is associated with Product'},status=status.HTTP_405_METHOD_NOT_ALLOWED)
         return super().destroy(request,*args,**kwargs)
 
+#--------------------------Reviews----------------------------------------
+
+class ReviewViewSet(ModelViewSet):
+     query = Reviews.objects.all()
+     serialzer_class = ReviewSerializer
