@@ -3,10 +3,12 @@ from django.db.models.aggregates import Count, Min, Max, Avg, Sum
 from django_filters.rest_framework import DjangoFilterBackend
 from store.models import Product,Customer, Order, OrderItem, Collection,Reviews
 from . filters import ProductFilter
-from rest_framework.filters import SearchFilter
+from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
+from . pagination import DefaultPagination
 from .serializer import ProductSerializer,CollectionSerializer,ReviewSerializer
 
 def say_hello(request):
@@ -20,9 +22,11 @@ def say_hello(request):
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = ProductFilter
+    pagination_class = DefaultPagination
     search_fields = ['title','description']
+    ordering_fields = ['unit_price','last_update']
 
     def get_serializer_context(self):
         return {'request':self.request}
