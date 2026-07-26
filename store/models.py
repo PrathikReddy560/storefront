@@ -101,7 +101,7 @@ class CartItem(models.Model):
     quantity = models.PositiveSmallIntegerField()
 
     class Meta:
-        unique_together =[['cart','product']]
+        unique_together =[['cart', 'product']]
 
 class Reviews(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')

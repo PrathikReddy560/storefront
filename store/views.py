@@ -5,12 +5,12 @@ from store.models import Product,Customer, Order, OrderItem, Collection,Reviews,
 from . filters import ProductFilter
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.mixins import CreateModelMixin
 from rest_framework.response import Response
+from rest_framework.mixins import CreateModelMixin
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet,GenericViewSet
 from . pagination import DefaultPagination
-from .serializer import ProductSerializer,CollectionSerializer,ReviewSerializer,CartSerialzer
+from .serializer import ProductSerializer,CollectionSerializer,ReviewSerializer,CartSerializer
 
 def say_hello(request):
     orders = Order.objects.filter(customer__id=1).aggregate(Count('id'))
@@ -63,6 +63,6 @@ class ReviewViewSet(ModelViewSet):
 
 #---------------------------------------Cart----------------------------------------------
 
-class CartViewSet(CreateModelMixin,GenericViewSet):
-    queryset = Cart.objects.all()
-    serializer_class = CartSerialzer
+class CartViewSet(ModelViewSet):
+    queryset = Cart.objects.prefetch_related('items__product').all()
+    serializer_class = CartSerializer
