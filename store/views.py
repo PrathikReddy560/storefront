@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render
 from django.db.models.aggregates import Count, Min, Max, Avg, Sum
 from django_filters.rest_framework import DjangoFilterBackend
-from store.models import Product,Customer, Order, OrderItem, Collection,Reviews, Cart
+from store.models import Product,Customer, Order, OrderItem, Collection,Reviews, Cart, CartItem
 from . filters import ProductFilter
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.pagination import PageNumberPagination
@@ -10,7 +10,7 @@ from rest_framework.mixins import CreateModelMixin
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet,GenericViewSet
 from . pagination import DefaultPagination
-from .serializer import ProductSerializer,CollectionSerializer,ReviewSerializer,CartSerializer
+from .serializer import ProductSerializer,CollectionSerializer,ReviewSerializer,CartSerializer,CartItemSerializer
 
 def say_hello(request):
     orders = Order.objects.filter(customer__id=1).aggregate(Count('id'))
@@ -66,3 +66,11 @@ class ReviewViewSet(ModelViewSet):
 class CartViewSet(ModelViewSet):
     queryset = Cart.objects.prefetch_related('items__product').all()
     serializer_class = CartSerializer
+
+class CartItemViewSet(ModelViewSet):
+    serializer_class = CartItemSerializer
+    def get_queryset(self):
+        return CartItem.objects.filter(cart_id=self.kwargs['cart_pk'])\
+        .select_related('product')
+    
+    
