@@ -10,7 +10,7 @@ from rest_framework.mixins import CreateModelMixin
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet,GenericViewSet
 from . pagination import DefaultPagination
-from .serializer import ProductSerializer,CollectionSerializer,ReviewSerializer,CartSerializer,CartItemSerializer
+from .serializer import ProductSerializer,CollectionSerializer,ReviewSerializer,CartSerializer,CartItemSerializer, AddCartItemSerializer
 
 def say_hello(request):
     orders = Order.objects.filter(customer__id=1).aggregate(Count('id'))
@@ -68,7 +68,15 @@ class CartViewSet(ModelViewSet):
     serializer_class = CartSerializer
 
 class CartItemViewSet(ModelViewSet):
-    serializer_class = CartItemSerializer
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return AddCartItemSerializer
+        return CartItemSerializer
+
+    def get_serializer_context(self):
+        return {'cart_id':  self.kwargs['cart_pk']}
+    
     def get_queryset(self):
         return CartItem.objects.filter(cart_id=self.kwargs['cart_pk'])\
         .select_related('product')
